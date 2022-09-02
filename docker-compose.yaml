@@ -27,14 +27,19 @@ services:
       - ./backend/.wwebjs_auth/:/usr/src/app/.wwebjs_auth/
     networks:
       - whaticket
+    deploy:
+      resources:
+        limits:
+          memory: 300M
+          cpus: '0.4'
+        reservations:
+          memory: 100M
 
   frontend:
     ports:
       - ${FRONTEND_PORT:-3000}:80
       - ${FRONTEND_SSL_PORT:-3001}:443
-    build:
-      context: ./frontend
-      dockerfile: ./Dockerfile
+    image: ghcr.io/aqkuwallet/whaticket/whaticket_frontend:latest
     environment:
       - URL_BACKEND=backend:3000
       - REACT_APP_BACKEND_URL=${BACKEND_URL:-http://localhost}:${PROXY_PORT:-8080}/
@@ -45,6 +50,13 @@ services:
       - ./ssl/www/:/var/www/letsencrypt/
     networks:
       - whaticket
+    deploy:
+      resources:
+        limits:
+          memory: 100M
+          cpus: '0.2'
+        reservations:
+          memory: 50M
 
   mysql:
     image: ${MYSQL_ENGINE:-mariadb}:${MYSQL_VERSION:-10.6}
@@ -60,3 +72,10 @@ services:
     restart: always
     networks:
       - whaticket
+    deploy:
+      resources:
+        limits:
+          memory: 400M
+          cpus: '0.3'
+        reservations:
+          memory: 100M
